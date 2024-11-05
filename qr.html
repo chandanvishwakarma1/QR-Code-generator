@@ -1,68 +1,59 @@
-* {
-  padding: 0;
-  margin: 0;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-}
-body {
-  background-color: bisque;
-  /* background: #000; */
-}
-.container {
-  width: 400px;
-  padding: 25px 35px;
-  background: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 10px;
-}
-.container p {
-  font-weight: 600;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-.container input {
-  width: 94%;
-  height: 50px;
-  border: 1px solid #494eea;
-  outline: 0;
-  padding: 10px;
-  margin: 10px 0 20px;
-  border-radius: 5px;
-}
-button {
-  width: 100%;
-  height: 50px;
-  background: #494eea;
-  color: #fff;
-  border: 0;
-  outline: 0;
-  border-radius: 5px;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  margin: 20px 0;
-  font-weight: 500;
-}
-#imageBox {
-  width: 200px;
-  border-radius: 5px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 1s;
-  /* background: #000; */
-  padding-right: 14px;
-}
-img {
-  width: 100%;
-  padding: 8px 8px;
-}
-#imageBox.show-img {
-  max-height: 300px;
-  margin: 10px auto;
-  border: 1px solid #d1d1d1;
-}
-#downloadButton {
-  margin-top: 0;
-}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="qr.css" />
+  </head>
+  <body>
+    <div class="container">
+      <p>Enter Your Text Or URL</p>
+      <input type="text" placeholder="Text or URL" id="qrinput" />
+      <div id="imageBox">
+        <img src="" id="qrimage" />
+      </div>
+      <button onclick="geneqr()">Generate QR</button>
+      <button onclick="downloadQR()" id="downloadButton" style="display: none">
+        Download QR
+      </button>
+    </div>
+
+    <script>
+      let imageBox = document.getElementById("imageBox");
+      let qrinput = document.getElementById("qrinput");
+      let qrimage = document.getElementById("qrimage");
+      let downloadButton = document.getElementById("downloadButton");
+
+      function geneqr() {
+        let qrData = qrinput.value;
+        if (qrData.trim() === "") {
+          alert("Please enter text or URL.");
+          return;
+        }
+        qrimage.src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
+          encodeURIComponent(qrData);
+        imageBox.classList.add("show-img");
+        downloadButton.style.display = "block"; // Show the download button after generating QR
+      }
+
+      function downloadQR() {
+        fetch(qrimage.src)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "qr_code.png";
+            link.click();
+            URL.revokeObjectURL(url); // Clean up the URL object after download
+          })
+          .catch((error) => {
+            console.error("Error downloading QR code:", error);
+            alert("Failed to download QR code. Please try again.");
+          });
+      }
+    </script>
+  </body>
+</html>
